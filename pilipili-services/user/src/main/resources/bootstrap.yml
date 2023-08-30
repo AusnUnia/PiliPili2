@@ -1,0 +1,41 @@
+server:
+  port: 12340
+
+mybatis-plus:
+  mapper-locations: classpath*:/mappers/*.xml
+  type-aliases-package: com.ausn.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/pilipili_db
+    username: root
+    password: FXYiloveyou1314
+
+  application:
+    name: pilipili-user
+
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.107.128:8848
+      config:
+        server-addr: 192.168.107.128:8848
+        file-extension: yml
+
+  redis:
+    host: 192.168.107.128
+    port: 6379
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 1
+
+login:
+  types:
+    password: passwordLoginStrategy
+    sms: smsLoginStrategy
+

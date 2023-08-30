@@ -1,0 +1,27 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: pilipili-gateway
+
+  cloud:
+    nacos:
+      server-addr: 192.168.107.128:8848
+
+    gateway:
+      routes:
+        - id: pilipili-user
+          uri: lb://pilipili-user
+          predicates:
+            - Path=/user/**
+
+        - id: pilipili-video
+          uri: lb://pilipili-video
+          predicates:
+            - Path=/videos/**
+
+        - id: pilipili-comment
+          uri: lb://pilipili-comment
+          predicates:
+           - Path=/comments/**

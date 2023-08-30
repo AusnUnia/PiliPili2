@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ausn.user.dao.PUserDao">
+    <insert id="save">
+        insert into pusers values(#{uid},#{phoneNumber},#{nickName},#{gender},#{birthday},#{avatarPath});
+    </insert>
+
+    <delete id="delete">
+        delete from pusers where uid=#{uid}
+    </delete>
+
+    <select id="getByUid" resultType="PUser">
+        select * from pusers where uid=#{uid}
+    </select>
+
+    <select id="getByPhoneNumber" resultType="com.ausn.entity.PUser">
+        select * from pusers where phone_number=#{phoneNumber}
+    </select>
+
+
+
+    <select id="getLastInsertedId" resultType="long">
+        SELECT LAST_INSERT_ID();
+    </select>
+
+</mapper>

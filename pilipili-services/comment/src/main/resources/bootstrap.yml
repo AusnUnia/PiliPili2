@@ -1,0 +1,23 @@
+server:
+  port: 12350
+
+mybatis-plus:
+  mapper-locations: classpath*:/mappers/*.xml
+  type-aliases-package: com.ausn.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/pilipili_db
+    username: root
+    password: FXYiloveyou1314
+
+  application:
+    name: pilipili-comment
+
+  cloud:
+    nacos:
+      server-addr: 192.168.107.128:8848
+
