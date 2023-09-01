@@ -1,6 +1,6 @@
 package com.ausn.video.feignClient;
 
-import com.ausn.feignClient.IVideoClient;
+import com.ausn.feign.feignClient.IVideoClient;
 import com.ausn.video.dao.VideoDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;

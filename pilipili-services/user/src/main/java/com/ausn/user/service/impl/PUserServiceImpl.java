@@ -145,6 +145,7 @@ public class PUserServiceImpl extends ServiceImpl<PUserDao, PUser> implements PU
 
         //send the verification code (it's just simulate the process)
         log.debug("发送短信验证码成功，验证码：{}",verificationCode);
+        System.out.println("发送短信验证码成功，验证码："+verificationCode);
 
         return Result.ok();
     }

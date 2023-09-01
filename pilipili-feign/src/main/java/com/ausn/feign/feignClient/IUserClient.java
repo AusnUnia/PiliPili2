@@ -1,4 +1,4 @@
-package com.ausn.feignClient;
+package com.ausn.feign.feignClient;
 
 import org.springframework.cloud.openfeign.FeignClient;
 

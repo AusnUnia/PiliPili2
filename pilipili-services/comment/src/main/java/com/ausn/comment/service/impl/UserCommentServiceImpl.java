@@ -10,7 +10,7 @@ import com.ausn.common.ResultCode;
 import com.ausn.common.utils.UserHolder;
 import com.ausn.entity.UserComment;
 import com.ausn.entity.requestEntity.CommentPublishRequest;
-import com.ausn.feignClient.IVideoClient;
+import com.ausn.feign.feignClient.IVideoClient;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

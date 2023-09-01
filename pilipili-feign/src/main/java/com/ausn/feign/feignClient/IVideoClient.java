@@ -1,4 +1,4 @@
-package com.ausn.feignClient;
+package com.ausn.feign.feignClient;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @Description:
  */
 @FeignClient("pilipili-video")
-@RequestMapping("/videos")
 public interface IVideoClient
 {
-    @PostMapping("/updateCommentNumByBv/{bv}/{num}")
+    @PostMapping("/videos/updateCommentNumByBv/{bv}/{num}")
     int updateCommentNumByBv(@PathVariable("bv") String bv,@PathVariable("num") int num);
 }
