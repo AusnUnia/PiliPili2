@@ -6,20 +6,20 @@ import cn.hutool.core.util.StrUtil;
 import com.ausn.common.constants.RedisConstants;
 import com.ausn.common.utils.UserHolder;
 import com.ausn.entity.dto.PUserDTO;
-import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.annotation.Order;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+@Order(1)
 @Component
-public class RefreshTokenFilter implements GatewayFilter
+public class RefreshTokenFilter implements GlobalFilter
 {
     private StringRedisTemplate stringRedisTemplate; //this is not managed by spring, must inject it through constructor
 

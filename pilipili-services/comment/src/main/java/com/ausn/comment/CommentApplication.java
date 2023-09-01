@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ComponentScan;
 @SpringBootApplication
 @EnableFeignClients
 @EnableDiscoveryClient
-@ComponentScan("com.ausn.common.config")
+@ComponentScan({"com.ausn.common","com.ausn.feignClient","com.ausn.comment"})
 public class CommentApplication {
 
     public static void main(String[] args)

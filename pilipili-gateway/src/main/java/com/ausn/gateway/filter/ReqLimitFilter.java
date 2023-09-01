@@ -1,15 +1,14 @@
 package com.ausn.gateway.filter;
 
 
-import com.alibaba.fastjson2.JSON;
 import com.ausn.common.Result;
 import com.ausn.common.constants.RedisConstants;
 import com.ausn.common.utils.IpUtil;
-import com.ausn.common.utils.UserHolder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.core.annotation.Order;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpStatus;
@@ -18,14 +17,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.PrintWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.TimeUnit;
 
+@Order(3)
 @Component
-public class ReqLimitFilter implements GatewayFilter
+public class ReqLimitFilter implements GlobalFilter
 {
     private StringRedisTemplate stringRedisTemplate;
 
@@ -42,6 +38,7 @@ public class ReqLimitFilter implements GatewayFilter
         //only limit requests that is related to upvote and comment publish
         if(!path.contains("upvote")&&!path.contains("/publish"))
         {
+            System.out.println("pass !!");
             return chain.filter(exchange);
         }
 

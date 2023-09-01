@@ -28,7 +28,7 @@
         <project.version>0.0.1-SNAPSHOT</project.version>
 
         <spring.boot.version>2.7.6</spring.boot.version>
-        <com.alibaba.cloud>2021.0.1.0</com.alibaba.cloud>
+        <com.alibaba.cloud>2021.0.5.0</com.alibaba.cloud>
         <spring.cloud.version>2021.0.8</spring.cloud.version>
         <mybatis.plus.version>3.5.3.1</mybatis.plus.version>
     </properties>

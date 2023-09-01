@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.ausn.pilipili.dao.VideoDao">
+<mapper namespace="com.ausn.video.dao.VideoDao">
     <insert id="save">
         insert into videos values(#{bv},#{title},#{authorId},#{viewNum},
         #{uploadDate},#{bulletScreenNum},#{commentNum},#{upvoteNum},#{downvoteNum},#{coinNum},

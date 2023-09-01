@@ -2,17 +2,41 @@ server:
   port: 8080
 
 spring:
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/pilipili_db
+    username: root
+    password: FXYiloveyou1314
+
+  redis:
+    host: 192.168.107.128
+    port: 6379
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 1
+
   application:
     name: pilipili-gateway
 
   cloud:
     nacos:
-      server-addr: 192.168.107.128:8848
+      discovery:
+        server-addr: 192.168.107.128:8848
 
     gateway:
+
+      discovery:
+        locator:
+          enabled: true
+
+      enabled: true
+
       routes:
         - id: pilipili-user
-          uri: lb://pilipili-user
+          uri: http://localhost:12340
           predicates:
             - Path=/user/**
 
@@ -25,3 +49,8 @@ spring:
           uri: lb://pilipili-comment
           predicates:
            - Path=/comments/**
+
+    loadbalancer:
+      enabled: true
+
+
