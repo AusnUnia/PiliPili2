@@ -1,22 +1,53 @@
 package com.ausn.common;
 
-public class ResultCode
+import lombok.Getter;
+import org.springframework.http.HttpStatus;
+
+@Getter
+public enum ResultCode
 {
-    public static final Integer DEFAULT_OK=10001;
-    public static final Integer DEFAULT_ERR=10000;
+    DEFAULT_OK(10001,"DEFAULT_OK",HttpStatus.OK),
 
-    public static final Integer SAVE_OK=20011;
-    public static final Integer DELETE_OK=20021;
-    public static final Integer UPDATE_OK=20031;
-    public static final Integer GET_OK=20041;
+    DEFAULT_ERR(10000,"DEFAULT_ERR",HttpStatus.BAD_REQUEST),
 
-    public static final Integer SAVE_ERR=20010;
-    public static final Integer DELETE_ERR=20020;
-    public static final Integer UPDATE_ERR=20030;
-    public static final Integer GET_ERR=20040;
+    SAVE_OK(20011,"SAVE_OK",HttpStatus.OK),
 
-    public static final Integer SYSTEM_ERR=50001;
-    public static final Integer SYSTEM_TIMEOUT_ERR=50002;
-    public static final Integer SYSTEM_UNKNOWN_ERR=59999;
-    public static final Integer BUSINESS_ERR=60001;
+    DELETE_OK(20021,"DELETE_OK",HttpStatus.OK),
+
+    UPDATE_OK(20031,"UPDATE_OK",HttpStatus.OK),
+
+    GET_OK(20041,"GET_OK",HttpStatus.OK),
+
+    SAVE_ERR(20010,"SAVE_ERR",HttpStatus.BAD_REQUEST),
+
+    DELETE_ERR(20020,"DELETE_ERR",HttpStatus.BAD_REQUEST),
+
+    UPDATE_ERR(20030,"UPDATE_ERR",HttpStatus.BAD_REQUEST),
+
+    GET_ERR(20040,"GET_ERR",HttpStatus.BAD_REQUEST),
+
+    SYSTEM_ERR(50001,"SYSTEM_ERR",HttpStatus.BAD_REQUEST),
+
+    SYSTEM_TIMEOUT_ERR(50002,"SYSTEM_TIMEOUT_ERR",HttpStatus.BAD_REQUEST),
+
+    SYSTEM_UNKNOWN_ERR(59999,"SYSTEM_UNKNOWN_ERR",HttpStatus.BAD_REQUEST),
+
+    BUSINESS_ERR(60001,"BUSINESS_ERR",HttpStatus.BAD_REQUEST),
+
+    UNAUTHORIZED(70001,"unauthorized",HttpStatus.UNAUTHORIZED),
+
+    PHONE_NUMBER_NOT_EXIST(70002,"phone number not exist",HttpStatus.NOT_EXTENDED);
+
+
+    private int code;
+    private String message;
+    private HttpStatus httpStatus;
+
+    ResultCode(int code, String message,HttpStatus httpStatus)
+    {
+        this.code = code;
+        this.message = message;
+        this.httpStatus = httpStatus;
+    }
+
 }

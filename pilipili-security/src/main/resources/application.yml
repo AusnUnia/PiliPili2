@@ -1,0 +1,4 @@
+
+mybatis-plus:
+  mapper-locations: classpath*:/mappers/*.xml
+  type-aliases-package: com.ausn.entity

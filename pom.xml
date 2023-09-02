@@ -16,6 +16,7 @@
         <module>pilipili-common</module>
         <module>pilipili-feign</module>
         <module>pilipili-gateway</module>
+        <module>pilipili-security</module>
     </modules>
 
 

@@ -7,11 +7,11 @@ import lombok.Setter;
 @Setter
 public class Result
 {
-    private int code;
+    private ResultCode code;
     private String message;
     private Object data;
 
-    public Result(int code, String message, Object data)
+    public Result(ResultCode code, String message, Object data)
     {
         this.code = code;
         this.message = message;
@@ -21,11 +21,11 @@ public class Result
     {
         return new Result(ResultCode.DEFAULT_OK,null,null);
     }
-    static public Result ok(int code)
+    static public Result ok(ResultCode code)
     {
         return new Result(code,null,null);
     }
-    static public Result ok(int code,Object data)
+    static public Result ok(ResultCode code,Object data)
     {
         return new Result(code,null,data);
     }
@@ -33,7 +33,7 @@ public class Result
     {
         return new Result(ResultCode.DEFAULT_ERR,message,null);
     }
-    static public Result fail(int code,String message)
+    static public Result fail(ResultCode code,String message)
     {
         return new Result(code,message,null);
     }
