@@ -35,8 +35,8 @@ spring:
       enabled: true
 
       routes:
-        - id: pilipili-user
-          uri: http://localhost:12340
+        - id: pilipili-security
+          uri: lb://pilipili-security
           predicates:
             - Path=/user/**
 

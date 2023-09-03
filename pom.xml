@@ -94,6 +94,11 @@
                 <version>${project.version}</version>
             </dependency>
             <dependency>
+                <artifactId>pilipili-security</artifactId>
+                <groupId>com.ausn</groupId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <artifactId>pilipili-model</artifactId>
                 <groupId>com.ausn</groupId>
                 <version>${project.version}</version>

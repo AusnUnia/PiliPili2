@@ -36,7 +36,7 @@ public class SecurityUser implements UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities()
     {
-        GrantedAuthority authority = new GrantedAuthority()
+/*        GrantedAuthority authority = new GrantedAuthority()
         {
             @Override
             public String getAuthority()
@@ -44,15 +44,15 @@ public class SecurityUser implements UserDetails
                 return "user:common";
             }
         };
-        authorities.add(authority);
-        return authorities;
+        authorities.add(authority);*/
+        return null;
     }
 
     @Override
     public String getPassword()
     {
         String password=pUser.getPassword();
-        pUser.setPassword(null); //erase the password
+        //pUser.setPassword(null); //erase the password
         return password;
     }
 

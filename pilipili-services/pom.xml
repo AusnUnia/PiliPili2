@@ -31,7 +31,7 @@
         <!-- 引入公共的模块依赖 -->
         <dependency>
             <groupId>com.ausn</groupId>
-            <artifactId>pilipili-common</artifactId>
+            <artifactId>pilipili-security</artifactId>
         </dependency>
         <dependency>
             <groupId>com.ausn</groupId>

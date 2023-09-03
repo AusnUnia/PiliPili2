@@ -1,0 +1,41 @@
+
+#the config of mybatis
+mybatis-plus:
+  mapper-locations: classpath*:/mappers/*.xml
+  type-aliases-package: com.ausn.entity
+
+
+server:
+  port: 12400
+
+spring:
+  application:
+    name: pilipili-security
+
+  #the config of mysql
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/pilipili_db
+    username: root
+    password: FXYiloveyou1314
+
+
+  #the config of redis
+  redis:
+    host: 192.168.107.128
+    port: 6379
+    lettuce:
+      pool:
+        max-active: 4
+        max-idle: 4
+        min-idle: 1
+
+  cloud:
+    nacos:
+      server-addr: 192.168.107.128:8848
+
+
+login:
+  types:
+    password: passwordLoginStrategy
+    sms: smsLoginStrategy

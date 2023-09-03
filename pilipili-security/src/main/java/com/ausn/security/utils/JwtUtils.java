@@ -25,7 +25,7 @@ public class JwtUtils
     // 设置 token 有效期为 7 天
     private static final long time = 1000 * 60 * 60 * 24 * 7;
     // 定义签名密钥
-    private static final String signature = "AusnUnia@GitHub";
+    private static final String signature = "AusnUniaGitHub31415926qwertyuiopasdfghjklzxcvbnmAusnUniaGitHub31415926qwertyuiopasdfghjklzxcvbnmAusnUniaGitHub31415926qwertyuiopasdfghjklzxcvbnm";
 
     /**
      * 根据用户信息生成 JWT token。
@@ -97,7 +97,7 @@ public class JwtUtils
             log.info("token:"+token);
             throw new UnAuthorizedException();
         }
-        String phonenum = (String) claims.get("phoneNumber");
+        String phoneNumber = (String) claims.get("phoneNumber");
         Long id = (Long) claims.get("uid");
         // 从 Claims 中提取用户数据，并创建 User 对象
         // 返回创建的 User 对象

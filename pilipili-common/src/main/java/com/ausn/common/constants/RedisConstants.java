@@ -4,7 +4,7 @@ public class RedisConstants
 {
     static public final String LOGIN_CODE_KEY_PREFIX="user:login:verification:"; //usage:  key is login:verification:<phone number>, value is verification code like 223344
     static public final Long LOGIN_CODE_TTL=3L; //the time to live of verification code (minutes)
-    static public final String LOGIN_PUSER_KEY_PREFIX="user:login:token:"; //usage:  key is login:token:<token>, value is a PUser object
+    static public final String LOGIN_PUSER_KEY_PREFIX="user:login:info:"; //usage:  key is login:info:<uid>, value is a PUser object
     static public final Long LOGIN_PUSER_TTL=10080L; //the time to live of user login information (minutes)
     static public final String VIDEO_CACHE_KEY_PREFIX="video:info:"; //usage:  key is video:<bv>, value is a Video object
     static public final Long VIDEO_CACHE_TTL=10L; //

@@ -1,10 +1,8 @@
-package com.ausn.user.service.impl;
+package com.ausn.security.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
-import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.jwt.JWTUtil;
 import com.ausn.common.Result;
 import com.ausn.common.ResultCode;
 import com.ausn.common.constants.LocalConstants;
@@ -13,11 +11,11 @@ import com.ausn.common.utils.PUserUtil;
 import com.ausn.entity.PUser;
 import com.ausn.entity.dto.LoginFormDTO;
 import com.ausn.entity.dto.PUserDTO;
+import com.ausn.security.dao.PUserDao;
+import com.ausn.security.service.PUserService;
+import com.ausn.security.strategy.login.LoginStrategy;
+import com.ausn.security.strategy.login.LoginStrategyFactory;
 import com.ausn.security.utils.JwtUtils;
-import com.ausn.user.dao.PUserDao;
-import com.ausn.user.service.PUserService;
-import com.ausn.user.strategy.login.LoginStrategy;
-import com.ausn.user.strategy.login.LoginStrategyFactory;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -87,7 +85,7 @@ public class PUserServiceImpl extends ServiceImpl<PUserDao, PUser> implements PU
     @Override
     public Result login(LoginFormDTO loginFormDTO)
     {
-        System.out.println(loginFormDTO);
+        log.info(loginFormDTO.toString());
 
         //login by type
         LoginStrategy strategy = loginStrategyFactory.getStrategy(loginFormDTO.getType());
