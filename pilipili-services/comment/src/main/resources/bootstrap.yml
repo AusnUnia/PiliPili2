@@ -21,3 +21,19 @@ spring:
     nacos:
       server-addr: 192.168.107.128:8848
 
+  #the config of kafka
+  kafka:
+    bootstrap-servers: 192.168.107.128:9092
+    producer:
+      batch-size: 32768
+      buffer-memory: 33554432
+      compression-type: snappy
+      acks: 1
+      retries: 3
+
+    consumer:
+      enable-auto-commit: false
+
+    listener:
+      ack-mode: manual
+

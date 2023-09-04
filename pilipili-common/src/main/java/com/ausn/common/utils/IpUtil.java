@@ -12,33 +12,33 @@ import javax.servlet.http.HttpServletRequest;
 
 public class IpUtil
 {
-    public static String getIpAddr(ServerHttpRequest request)
+    public static String getIpAddr(HttpServletRequest request)
     {
         if (request == null)
         {
             return "unknown";
         }
-        String ip = request.getHeaders().getFirst("x-forwarded-for");
+        String ip = request.getHeader("x-forwarded-for");
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip))
         {
-            ip = request.getHeaders().getFirst("Proxy-Client-IP");
+            ip = request.getHeader("Proxy-Client-IP");
         }
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip))
         {
-            ip = request.getHeaders().getFirst("X-Forwarded-For");
+            ip = request.getHeader("X-Forwarded-For");
         }
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip))
         {
-            ip = request.getHeaders().getFirst("WL-Proxy-Client-IP");
+            ip = request.getHeader("WL-Proxy-Client-IP");
         }
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip))
         {
-            ip = request.getHeaders().getFirst("X-Real-IP");
+            ip = request.getHeader("X-Real-IP");
         }
 
         if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip))
         {
-            ip = request.getRemoteAddress().getHostString();
+            ip = request.getRemoteAddr();
         }
         //ip = EscapeUtil.clean(ip);// 清除Xss特殊字符
         return "0:0:0:0:0:0:0:1".equals(ip) ? "127.0.0.1" : ip;

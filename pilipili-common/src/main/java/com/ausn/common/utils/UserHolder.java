@@ -1,8 +1,6 @@
 package com.ausn.common.utils;
 
-
 import com.ausn.entity.dto.PUserDTO;
-
 public class UserHolder
 {
     private static final ThreadLocal<PUserDTO> tl = new ThreadLocal<>();

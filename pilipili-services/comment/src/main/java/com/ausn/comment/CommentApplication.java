@@ -1,5 +1,6 @@
 package com.ausn.comment;
 
+import com.ausn.feign.config.FeignConfig;
 import com.ausn.feign.feignClient.IVideoClient;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -8,7 +9,7 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
-@EnableFeignClients(clients = {IVideoClient.class})
+@EnableFeignClients(clients = {IVideoClient.class},defaultConfiguration={FeignConfig.class})
 @EnableDiscoveryClient
 @ComponentScan({"com.ausn.common","com.ausn.comment"})
 public class CommentApplication {

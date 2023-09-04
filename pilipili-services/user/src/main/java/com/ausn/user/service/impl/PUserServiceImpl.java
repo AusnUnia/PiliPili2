@@ -107,7 +107,7 @@ public class PUserServiceImpl extends ServiceImpl<PUserDao, PUser> implements PU
         //cache the information of the user in Redis
 
         //generate token, this is the key to identify whether a user has logged in.
-        String token= JwtUtils.EncodeToken(pUser);
+        String token= JwtUtils.encodeToken(pUser);
 
         //cache user's information in Redis in the form of hash
         PUserDTO pUserDTO= BeanUtil.copyProperties(pUser, PUserDTO.class); //extract the insensitive information of the user

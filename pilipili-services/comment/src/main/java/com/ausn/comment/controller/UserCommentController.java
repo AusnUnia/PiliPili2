@@ -40,6 +40,6 @@ public class UserCommentController
     public Result delete(@PathVariable String bv,@RequestBody UserComment userComment)
     {
         boolean flag=userCommentService.delete(userComment);
-        return new Result(123,"",flag);
+        return new Result(ResultCode.DEFAULT_OK,"",flag);
     }
 }

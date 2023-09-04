@@ -15,7 +15,7 @@ import com.ausn.security.dao.PUserDao;
 import com.ausn.security.service.PUserService;
 import com.ausn.security.strategy.login.LoginStrategy;
 import com.ausn.security.strategy.login.LoginStrategyFactory;
-import com.ausn.security.utils.JwtUtils;
+import com.ausn.common.utils.JwtUtils;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -105,7 +105,7 @@ public class PUserServiceImpl extends ServiceImpl<PUserDao, PUser> implements PU
         //cache the information of the user in Redis
 
         //generate token, this is the key to identify whether a user has logged in.
-        String token= JwtUtils.EncodeToken(pUser);
+        String token= JwtUtils.encodeToken(pUser);
 
         //cache user's information in Redis in the form of hash
         PUserDTO pUserDTO= BeanUtil.copyProperties(pUser, PUserDTO.class); //extract the insensitive information of the user
@@ -116,7 +116,7 @@ public class PUserServiceImpl extends ServiceImpl<PUserDao, PUser> implements PU
                         .setFieldValueEditor((field,val)->val.toString())
         );                                                                 //convert the bean of user's insensitive information into map which can be accepted by the Redis
         //System.out.println("in PUSerServ: pUserMap:"+pUserMap);
-        stringRedisTemplate.opsForHash().putAll(RedisConstants.LOGIN_PUSER_KEY_PREFIX+token,pUserMap);
+        stringRedisTemplate.opsForHash().putAll(RedisConstants.LOGIN_PUSER_KEY_PREFIX+pUser.getUid(),pUserMap);
 
         //set the login period of validity
         stringRedisTemplate.expire(RedisConstants.LOGIN_PUSER_KEY_PREFIX+token,RedisConstants.LOGIN_PUSER_TTL, TimeUnit.MINUTES);

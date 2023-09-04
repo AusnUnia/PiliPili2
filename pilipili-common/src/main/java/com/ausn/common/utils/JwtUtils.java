@@ -1,10 +1,9 @@
-package com.ausn.security.utils;
+package com.ausn.common.utils;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.ausn.common.constants.RedisConstants;
 import com.ausn.common.exception.bizException.UnAuthorizedException;
 import com.ausn.entity.PUser;
-import com.ausn.security.dao.PUserDao;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +18,6 @@ import java.util.UUID;
 @Component
 public class JwtUtils
 {
-
-    @Autowired
-    private PUserDao pUserDao;
     // 设置 token 有效期为 7 天
     private static final long time = 1000 * 60 * 60 * 24 * 7;
     // 定义签名密钥
@@ -31,7 +27,7 @@ public class JwtUtils
      * 根据用户信息生成 JWT token。
      *
      */
-    public static String EncodeToken(PUser pUser)
+    public static String encodeToken(PUser pUser)
     {
         JwtBuilder jwtBuilder = Jwts.builder();
         String jwtToken = jwtBuilder
@@ -56,7 +52,7 @@ public class JwtUtils
      * @param token 待解码的 JWT token 字符串
      * @return Claims对象，包含token中的声明信息；如果解析过程发生异常，则返回null。
      */
-    public static Claims DecodeToken(String token)
+    public static Claims decodeToken(String token)
     {
         try
         {
@@ -90,7 +86,7 @@ public class JwtUtils
     {
 
         // 解析 token 获取 Claims 数据
-        Claims claims = DecodeToken(token);
+        Claims claims = decodeToken(token);
 
         if (claims == null || !claims.containsKey("id"))
         {
@@ -108,8 +104,6 @@ public class JwtUtils
 
         return pUser;
     }
-
-
 
 
 }
