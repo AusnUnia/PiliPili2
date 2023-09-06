@@ -20,6 +20,7 @@
         <module>user</module>
         <module>video</module>
         <module>comment</module>
+        <module>live</module>
     </modules>
 
     <properties>
@@ -36,6 +37,11 @@
         <dependency>
             <groupId>com.ausn</groupId>
             <artifactId>pilipili-feign</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-seata</artifactId>
         </dependency>
 
         <dependency>

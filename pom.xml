@@ -32,6 +32,7 @@
         <com.alibaba.cloud>2021.0.5.0</com.alibaba.cloud>
         <spring.cloud.version>2021.0.8</spring.cloud.version>
         <mybatis.plus.version>3.5.3.1</mybatis.plus.version>
+        <seata.version>1.7.0</seata.version>
     </properties>
 
 
