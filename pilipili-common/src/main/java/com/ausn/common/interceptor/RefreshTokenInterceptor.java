@@ -9,10 +9,12 @@ import com.ausn.common.utils.JwtUtils;
 import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -31,7 +33,7 @@ public class RefreshTokenInterceptor implements HandlerInterceptor
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception
     {
         //get token
-        String token=request.getHeader("Authorization");
+        String token=request.getHeader(HttpHeaders.AUTHORIZATION);
         if(StrUtil.isBlank(token))
         {
             System.out.println("blank token! "+request.getRequestURI());
@@ -61,6 +63,7 @@ public class RefreshTokenInterceptor implements HandlerInterceptor
         //save the user information in ThreadLocal. every time the user send a request the user information will be saved in TheadLocal and will be deleted after the request completed (in afterCompletion method)
         //System.out.println("in refresh interceptor: userMap:"+userMap);
         PUserDTO pUserDTO= BeanUtil.fillBeanWithMap(userMap,new PUserDTO(),false);
+        pUserDTO.setToken(token);
         UserHolder.saveUser(pUserDTO);
 
         //refresh the token, if the user are frequently using , this will be triggered again and again, the user won't be logged out due to timeout.

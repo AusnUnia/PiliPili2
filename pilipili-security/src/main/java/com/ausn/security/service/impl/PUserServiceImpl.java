@@ -109,6 +109,7 @@ public class PUserServiceImpl extends ServiceImpl<PUserDao, PUser> implements PU
 
         //cache user's information in Redis in the form of hash
         PUserDTO pUserDTO= BeanUtil.copyProperties(pUser, PUserDTO.class); //extract the insensitive information of the user
+        pUserDTO.setToken(token);
         Map<String,Object> pUserMap=BeanUtil.beanToMap(
                 pUserDTO,new HashMap<>(),
                 CopyOptions.create()

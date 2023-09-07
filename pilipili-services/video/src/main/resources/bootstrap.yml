@@ -1,5 +1,5 @@
 server:
-  port: 12360
+  port: 12371
 
 mybatis-plus:
   mapper-locations: classpath*:/mappers/*.xml
@@ -21,3 +21,16 @@ spring:
     nacos:
       server-addr: 192.168.107.128:8848
 
+seata:
+  registry:
+    type: nacos
+    nacos:
+      server-addr: 192.168.107.128:8848
+      namespace: ""
+      group: SEATA_GROUP
+      application: seata-server
+
+  tx-service-group: transaction_group
+  service:
+    vgroup-mapping:
+      transaction_group: default

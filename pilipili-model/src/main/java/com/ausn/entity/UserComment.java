@@ -1,5 +1,6 @@
 package com.ausn.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -23,6 +24,8 @@ create table comments
 @TableName("user_comments")
 public class UserComment
 {
+    @TableId
+    private Long id;
     private Long commentId; //评论编号
     private String bv; //所属视频编号
     private Long userId;  //发布评论的用户的id

@@ -21,6 +21,10 @@ spring:
     nacos:
       server-addr: 192.168.107.128:8848
 
+
+
+
+
   #the config of kafka
   kafka:
     bootstrap-servers: 192.168.107.128:9092
@@ -29,11 +33,27 @@ spring:
       buffer-memory: 33554432
       compression-type: snappy
       acks: 1
-      retries: 3
+      retries: 1
 
     consumer:
       enable-auto-commit: false
 
     listener:
       ack-mode: manual
+
+seata:
+  registry:
+    type: nacos
+    nacos:
+      server-addr: 192.168.107.128:8848
+      namespace: ""
+      group: SEATA_GROUP
+      application: seata-server
+
+  tx-service-group: transaction_group
+  service:
+    vgroup-mapping:
+      transaction_group: default
+  data-source-proxy-mode: XA
+
 

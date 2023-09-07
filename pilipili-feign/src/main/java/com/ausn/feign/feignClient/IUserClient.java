@@ -1,5 +1,7 @@
 package com.ausn.feign.feignClient;
 
+import com.ausn.feign.config.FeignConfig;
+import com.ausn.feign.interceptor.FeignInterceptor;
 import org.springframework.cloud.openfeign.FeignClient;
 
 /**
@@ -8,7 +10,7 @@ import org.springframework.cloud.openfeign.FeignClient;
  * @Description:
  */
 
-@FeignClient("user-service")
+@FeignClient(value="user-service",configuration = FeignInterceptor.class)
 public interface IUserClient
 {
 

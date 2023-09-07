@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 
 @RestController
-@RequestMapping("/video")
+@RequestMapping("/videos")
 public class VideoClientImpl implements IVideoClient
 {
     @Autowired

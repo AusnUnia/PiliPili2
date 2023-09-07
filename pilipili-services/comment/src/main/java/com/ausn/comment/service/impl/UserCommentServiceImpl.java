@@ -3,7 +3,9 @@ package com.ausn.comment.service.impl;
 import cn.hutool.core.lang.Snowflake;
 import com.alibaba.fastjson2.JSON;
 
+import com.alibaba.fastjson2.TypeReference;
 import com.ausn.comment.dao.UserCommentDao;
+import com.ausn.comment.kafka.KafkaMessage;
 import com.ausn.comment.service.UserCommentService;
 import com.ausn.common.Result;
 import com.ausn.common.ResultCode;
@@ -12,6 +14,7 @@ import com.ausn.entity.UserComment;
 import com.ausn.entity.requestEntity.CommentPublishRequest;
 import com.ausn.feign.feignClient.IVideoClient;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.seata.spring.annotation.GlobalTransactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -21,6 +24,7 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.web.context.request.RequestContextHolder;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -62,8 +66,11 @@ public class UserCommentServiceImpl extends ServiceImpl<UserCommentDao, UserComm
         UserComment userComment=createUserComment(commentPublishRequest.getBv(), userId);
         userComment.setContent(commentPublishRequest.getContent());
 
-        //TODO 用消息队列异步将评论存入mysql
-        kafkaTemplate.send("comment_topic", JSON.toJSONString(userComment)).addCallback
+        //TODO 用消息队列异步将评论存入mysql,需要用拦截器附带token信息，因为消费者还要转发到其他微服务。
+        KafkaMessage<UserComment> message=new KafkaMessage<>();
+        message.setPUserDTO(UserHolder.getUser());
+        message.setData(userComment);
+        kafkaTemplate.send("comment_topic", JSON.toJSONString(message)).addCallback
         (
             new ListenableFutureCallback<SendResult<String,String>>()
             {
@@ -86,10 +93,13 @@ public class UserCommentServiceImpl extends ServiceImpl<UserCommentDao, UserComm
     }
 
     @KafkaListener(topics = "comment_topic",groupId = "comment_group",concurrency = "8")
-    @Transactional
-    public void saveCommentToMysql(String userCommentStr, Acknowledgment acknowledgment)
+    @GlobalTransactional
+    public void saveCommentToMysql(String messageStr, Acknowledgment acknowledgment)
     {
-        UserComment userComment=JSON.parseObject(userCommentStr,UserComment.class);
+        RequestContextHolder.setRequestAttributes(RequestContextHolder.getRequestAttributes(),true);
+        KafkaMessage<UserComment> message=JSON.parseObject(messageStr,new TypeReference<KafkaMessage<UserComment>>(){});
+        UserHolder.saveUser(message.getPUserDTO());
+        UserComment userComment=message.getData();
 
         //to avoid consume repeatedly
         boolean consumed = query().eq("commentId", userComment.getCommentId()).exists();
@@ -121,6 +131,7 @@ public class UserCommentServiceImpl extends ServiceImpl<UserCommentDao, UserComm
     }
 
     @Override
+    @GlobalTransactional
     public boolean delete(UserComment userComment)
     {
         return userCommentDao.delete(userComment)>0&&

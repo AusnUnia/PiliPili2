@@ -1,22 +1,21 @@
 package com.ausn.feign.config;
 
-import feign.RequestInterceptor;
-import feign.RequestTemplate;
+import com.ausn.feign.interceptor.FeignInterceptor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
+/**
+ * @Author: Ausn
+ * @DateTime: 2023/9/7 2:09
+ * @Description:
+ */
 
 @Configuration
-public class FeignConfig implements RequestInterceptor
+public class FeignConfig
 {
-    @Override
-    public void apply(RequestTemplate requestTemplate)
+    @Bean
+    public FeignInterceptor feginInterceptor()
     {
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attributes.getRequest();
-        requestTemplate.header(HttpHeaders.AUTHORIZATION, request.getHeader(HttpHeaders.AUTHORIZATION));
+        return new FeignInterceptor();
     }
 }
