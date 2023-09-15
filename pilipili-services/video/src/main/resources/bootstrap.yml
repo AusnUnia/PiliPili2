@@ -10,9 +10,9 @@ mybatis-plus:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/pilipili_db
-    username: root
-    password: FXYiloveyou1314
+    url: jdbc:mysql://192.168.107.128:3306/pilipili_db
+    username: Ausn
+    password: QWERTqwert7654321@
 
   application:
     name: pilipili-video
@@ -34,3 +34,27 @@ seata:
   service:
     vgroup-mapping:
       transaction_group: default
+
+### xxl-job admin address list, such as "http://address" or "http://address01,http://address02"
+xxl:
+  job:
+    admin:
+      addresses: http://127.0.0.1:8964/xxl-job-admin
+
+### xxl-job, access token
+    accessToken: default_token
+
+### xxl-job executor appname
+    executor:
+      appname: xxl-job-executor-sample
+
+### xxl-job executor registry-address: default use address to registry , otherwise use ip:port if address is null
+      address:
+### xxl-job executor server-info
+      ip:
+
+      port: 9999
+### xxl-job executor log-path
+      logpath: /data/applogs/xxl-job/jobhandler
+### xxl-job executor log-retention-days
+      logretentiondays: 30

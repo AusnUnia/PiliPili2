@@ -5,9 +5,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/pilipili_db
+    url: jdbc:mysql://192.168.107.128:3306/pilipili_db
     username: root
-    password: FXYiloveyou1314
+    password: QWERTqwert7654321@
 
   redis:
     host: 192.168.107.128
