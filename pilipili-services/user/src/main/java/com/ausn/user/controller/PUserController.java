@@ -3,14 +3,17 @@ package com.ausn.user.controller;
 
 import com.ausn.common.Result;
 import com.ausn.common.ResultCode;
-import com.ausn.common.utils.PUserUtil;
-import com.ausn.entity.PUser;
-import com.ausn.entity.dto.LoginFormDTO;
+import com.ausn.common.utils.UserHolder;
+import com.ausn.entity.VideoFeedStream;
+import com.ausn.entity.requestEntity.NewVideosRequest;
 import com.ausn.user.service.PUserService;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -19,53 +22,24 @@ public class PUserController
     @Autowired
     private PUserService pUserService;
 
-    @PostMapping("/code")
-    public Result sendVerificationCode(@RequestParam("phone") String phoneNumber)
+    /*
+    if a user refresh the updates list of users he followed, this method will be called.
+     */
+
+    @GetMapping("/pullNewVideos")
+    public Result pull(@RequestBody NewVideosRequest newVideosRequest)
     {
-        System.out.println("sendVerificationCode");
-        return pUserService.sendVerificationCode(phoneNumber);
-    }
+        Long userId= UserHolder.getUser().getUid();
 
-    @PostMapping("/login")
-    public Result login(@RequestBody LoginFormDTO loginFormDTO)
-    {
-        return pUserService.login(loginFormDTO);
-    }
+        boolean pulled=pUserService.refreshVideoList(userId, newVideosRequest.getLastBv(),newVideosRequest.getTime());
 
-    @PostMapping("/register")
-    public Result register(@RequestBody LoginFormDTO loginFormDTO)
-    {
-        System.out.println(loginFormDTO);
-        //check the phone number
-        String phoneNumber= loginFormDTO.getPhoneNumber();
-        if(!PUserUtil.isPhoneNumberValid(phoneNumber))
+        if(!pulled)
         {
-            return Result.fail(ResultCode.BUSINESS_ERR,"请输入正确的手机号");
+            return Result.fail("刷新失败！");
         }
 
-        //confirm the verification code
-        boolean isValid=pUserService.confirmVerificationCode(phoneNumber,loginFormDTO.getVerificationCode());
-        if(!isValid)
-        {
-            return Result.fail("验证码错误");
-        }
-
-
-        //query the user by the phone number
-        PUser pUser= pUserService.query().eq("phone_number",phoneNumber).one();
-        if(pUser!=null)
-        {
-            return Result.fail("该手机号已经注册过了！");
-        }
-
-        pUser=pUserService.createUserWithPhoneNumberAndPassword(phoneNumber,loginFormDTO.getPassword());                                                              //convert the bean of user's insensitive information into map which can be accepted by the Redis
-
-        if(pUser!=null)
-        {
-            return Result.ok(ResultCode.DEFAULT_OK,"注册成功");
-        }
-
-        return Result.fail("注册失败");
+        List<VideoFeedStream> newVideoList = pUserService.getNewVideoList(userId, newVideosRequest.getLastBv(), newVideosRequest.getTime());
+        return Result.ok(ResultCode.DEFAULT_OK,newVideoList);
     }
 
 }

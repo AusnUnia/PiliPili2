@@ -5,7 +5,7 @@
 
 <mapper namespace="com.ausn.video.dao.VideoCoinDao">
     <insert id="save">
-        insert into video_coins (bv,userId,coinNum,putDate) values(#{bv},#{userId},#{coinNum},#{putDate});
+        insert into video_coins (id,bv,userId,coinNum,putDate) values(#{id},#{bv},#{userId},#{coinNum},#{putDate});
     </insert>
 
     <delete id="delete">

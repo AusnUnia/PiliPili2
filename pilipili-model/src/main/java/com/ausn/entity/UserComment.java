@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /*
 create table comments
@@ -29,7 +30,7 @@ public class UserComment
     private Long commentId; //评论编号
     private String bv; //所属视频编号
     private Long userId;  //发布评论的用户的id
-    private Timestamp sendDate; //评论发布日期
+    private LocalDateTime sendTime; //评论发布时间
     private String content; //评论内容
     private int upvoteNum; //点赞数量
     private int downvoteNum; //点踩数量

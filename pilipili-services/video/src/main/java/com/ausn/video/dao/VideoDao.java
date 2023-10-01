@@ -2,21 +2,21 @@ package com.ausn.video.dao;
 
 
 import com.ausn.entity.Video;
+import com.ausn.entity.VideoFeedStream;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
 public interface VideoDao extends BaseMapper<Video>
 {
-    public int save(Video video) throws SQLException;
-    public int delete(Video video);
     public Video getByBv(@Param("bv") String bv);
     public List<Video> getByAuthorId(@Param("authorId")String authorId);
-    public int update(Video video);
+
     public List<Video> getRandomly();
     public int updateViewNumByBv(@Param("bv") String bv,@Param("num") int num);
     public int updateBulletScreenNumByBv(@Param("bv") String bv,@Param("num") int num);
@@ -30,4 +30,5 @@ public interface VideoDao extends BaseMapper<Video>
     public int updateSaveNumByBv(@Param("bv") String bv,@Param("num") int num);
     public int updateShareNumByBv(@Param("bv") String bv,@Param("num") int num);
     public List<String> getBvByPage(@Param("offset") int offset,@Param("pageSize") int pageSize);
+    public List<VideoFeedStream> getNewVideos(@Param("authorId")Long authorId,@Param("uploadTime")LocalDateTime time);
 }

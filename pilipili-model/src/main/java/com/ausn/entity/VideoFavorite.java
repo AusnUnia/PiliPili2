@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /*
 the relationship between user saved or not and video
@@ -14,7 +15,7 @@ public class VideoFavorite
 {
     private String bv;
     private Long userId;
-    private Timestamp favoriteTime;
+    private LocalDateTime favoriteTime;
 }
 
 /*

@@ -4,15 +4,6 @@
         "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.ausn.video.dao.VideoDao">
-    <insert id="save">
-        insert into videos values(#{bv},#{title},#{authorId},#{viewNum},
-        #{uploadDate},#{bulletScreenNum},#{commentNum},#{upvoteNum},#{downvoteNum},#{coinNum},
-        #{saveNum},#{shareNum},#{tags},#{videoPath},#{description})
-    </insert>
-
-    <delete id="delete">
-        delete from videos where bv=#{bv}
-    </delete>
 
     <select id="getByBv" resultType="Video">
         select * from videos where bv=#{bv}
@@ -22,28 +13,6 @@
         select * from videos where authorId=#{authorId}
     </select>
 
-    <update id="update">
-        update videos
-        <set>
-            title=#{title},
-            authorId#{authorId},
-            viewNum=#{viewNum},
-            uploadDate=#{uploadDate},
-            bulletScreenNum=#{bulletScreenNum},
-            commentNum=#{commentNum},
-            upvoteNum=#{upvoteNum},
-            downvoteNum=#{downvoteNum},
-            coinNum=#{coinNum},
-            saveNum=#{saveNum},
-            shareNum=#{shareNum},
-            tags=#{tags},
-            videoPath=#{videoPath},
-            description=#{description}
-        </set>
-        <where>
-            bv=#{bv}
-        </where>
-    </update>
 
     <!--TODO 算法复杂度太高，之后要改进 -->
     <select id="getRandomly" resultType="Video">
@@ -96,5 +65,9 @@
 
     <select id="getBvByPage" resultType="String">
         select bv from videos limit #{offset},#{pageSize}
+    </select>
+
+    <select id="getNewVideos" resultType="com.ausn.entity.VideoFeedStream">
+        select bv,uploadTime from videos where authorId=#{authorId} and uploadTime>=#{uploadTime}
     </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.ausn.video.service.impl;
 
+import cn.hutool.core.lang.Snowflake;
 import cn.hutool.core.util.StrUtil;
 import com.alibaba.fastjson2.JSON;
 import com.ausn.common.Result;
@@ -22,6 +23,7 @@ import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -54,7 +56,9 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
     @Autowired
     private VideoCoinDao videoCoinDao;
 
-
+    @Autowired
+    @Qualifier("snowflake")
+    private Snowflake snowflake;
     @Autowired
     private RBloomFilter<String> bloomFilter;
     @Autowired
@@ -98,36 +102,11 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
         Video video=createNewVideo(videoUploadRequest,bv);
 
         //save the video information in mysql. the bv may duplicate, so when first duplicate occur, generate another bv.
-        try
+        boolean saved = save(video);
+        if(!saved)
         {
-            videoDao.save(video);
-        }
-        catch (SQLException e)
-        {
-            if(e.getErrorCode()==1062) //the primary key is duplicated, try to generate a new bv
-            {
-                bv=bvGenerator.generateBv();
-                video.setBv(bv);
-                try
-                {
-                    videoDao.save(video);
-                }
-                catch (SQLException ex)
-                {
-                    if(ex.getErrorCode()==1062)
-                    {
-                        System.out.println("duplicated bv!");
-                    }
-
-                    TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                    return null;
-                }
-            }
-            else
-            {
-                TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
-                return null;
-            }
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            return null;
         }
 
         //add the bv of the new video into bloom filter
@@ -151,7 +130,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
         video.setBv(bv);
         video.setAuthorId(UserHolder.getUser().getUid());
         video.setViewNum(0L);
-        video.setUploadDate(Timestamp.valueOf(LocalDateTime.now()));
+        video.setUploadTime(LocalDateTime.now());
         video.setBulletScreenNum(0L);
         video.setCommentNum(0L);
         video.setSaveNum(0L);
@@ -204,17 +183,6 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
         }
     }
 
-
-    @Override
-    public Result delete(Video video)
-    {
-        if(videoDao.delete(video)>0)
-        {
-            return Result.ok(ResultCode.DELETE_OK);
-        }
-
-        return Result.fail(ResultCode.DELETE_ERR,"failed to delete video!");
-    }
 
     @Override
     public Video getByBv(String bv)
@@ -286,7 +254,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
 
     public Result updateInMysql(Video video)
     {
-        if(videoDao.update(video)>0)
+        if(this.updateById(video))
         {
             stringRedisTemplate.delete(RedisConstants.VIDEO_CACHE_KEY_PREFIX+video.getBv());
             return Result.ok(ResultCode.UPDATE_OK);
@@ -318,47 +286,115 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
         //get current user's id
         Long userId=UserHolder.getUser().getUid();
 
-        //get the keys of sets in redis that contains users who upvoted or downvoted or canceled to the video
-        String upvoteKey=RedisConstants.VIDEO_UPVOTE_CACHE_KEY_PREFIX + bv;
-        String novoteKey=RedisConstants.VIDEO_NOVOTE_CACHE_KEY_PREFIX + bv;
-        String downvoteKey=RedisConstants.VIDEO_DOWNVOTE_CACHE_KEY_PREFIX + bv;
+        //get the key of sets in redis that contains users who upvoted or downvoted or canceled to the video
+        String voteKey=RedisConstants. VIDEO_VOTE_CACHE_KEY_PREFIX+ bv;
 
         /**
          * if the upvote data may be not in redis, don't need to reconstruct it. upvote usually
          * go along with getUpVoteNum , getUpVoteNum will reconstruct it.
          */
 
+        //if not voted yet
+        Boolean voted = stringRedisTemplate.opsForHash().hasKey(voteKey, userId.toString());
+        if(!voted)
+        {
+            stringRedisTemplate.opsForHash().put(voteKey, userId.toString(), "1");
+            return stringRedisTemplate.opsForHash().size(voteKey);
+        }
 
-        //when the user is upvoting or canceling the upvote, the downvote should always be false
-        stringRedisTemplate.opsForSet().remove(downvoteKey,userId.toString());
+        //get the vote information ,1 is upvoted, 0 is no vote, -1 is downvoted
+        String voteStr = (String)stringRedisTemplate.opsForHash().get(voteKey, userId.toString());
+
+        if(voteStr==null||voteStr.isBlank())
+        {
+            throw new RuntimeException("vote information error, user vote is null!");
+        }
+
+        int vote=Integer.parseInt(voteStr);
 
         //if the user has upvoted, cancel the upvote
-        if(stringRedisTemplate.opsForSet().isMember(upvoteKey,userId.toString()))
+        String upvoteNumKey=RedisConstants.VIDEO_UPVOTENUM_CACHE_KEY_PREFIX+bv;
+        if(vote==1)
         {
-            Long remove=stringRedisTemplate.opsForSet().remove(upvoteKey,userId.toString());
-            Long add=stringRedisTemplate.opsForSet().add(novoteKey,userId.toString());
-            System.out.println("removed:"+remove+"  added:"+add);
+            stringRedisTemplate.opsForHash().put(voteKey, userId.toString(), "0");
+            stringRedisTemplate.opsForValue().decrement(upvoteNumKey);
         }
-        //if the user has not upvoted, do upvote
         else
         {
-            Long add=stringRedisTemplate.opsForSet().add(upvoteKey,userId.toString());
-            Long remove=stringRedisTemplate.opsForSet().remove(novoteKey,userId.toString());
-            System.out.println("added:"+add+"  removed:"+remove);
+            stringRedisTemplate.opsForHash().put(voteKey, userId.toString(), "1");
+            stringRedisTemplate.opsForValue().increment(upvoteNumKey);
+            if(vote==-1)
+            {
+                stringRedisTemplate.opsForValue().decrement(RedisConstants.VIDEO_DOWNVOTENUM_CACHE_KEY_PREFIX+bv);
+            }
         }
 
         //return the refreshed upvote number
-        Long upvoteNum=stringRedisTemplate.opsForSet().size(upvoteKey);
+        Long upvoteNum=Long.parseLong(stringRedisTemplate.opsForValue().get(upvoteNumKey));
 
         return upvoteNum;
     }
 
     @Transactional
     @Override
-    public Result downvote(String bv)
+    public Long downvote(String bv)
     {
-        //TODO
-        return Result.ok(ResultCode.UPDATE_OK);
+        /**
+         * upvote operation only update the upvote number in redis, and the data in redis will
+         * be written into mysql by scheduled task
+         */
+
+        if(!bloomFilter.contains(bv))
+        {
+            return null;
+        }
+
+        //get current user's id
+        Long userId=UserHolder.getUser().getUid();
+
+        //get the keys of sets in redis that contains users who upvoted or downvoted or canceled to the video
+        String voteKey=RedisConstants. VIDEO_VOTE_CACHE_KEY_PREFIX+ bv;
+
+
+        //if not voted yet
+        Boolean voted = stringRedisTemplate.opsForHash().hasKey(voteKey, userId.toString());
+        if(!voted)
+        {
+            stringRedisTemplate.opsForHash().put(voteKey, userId.toString(), "1");
+            return stringRedisTemplate.opsForHash().size(voteKey);
+        }
+
+        //get the vote information ,1 is upvoted, 0 is no vote, -1 is downvoted
+        String voteStr = (String)stringRedisTemplate.opsForHash().get(voteKey,userId.toString());
+
+        if(voteStr==null||voteStr.isBlank())
+        {
+            throw new RuntimeException("vote information error, user vote is null!");
+        }
+
+        int vote=Integer.parseInt(voteStr);
+
+        //if the user has downvoted, cancel the upvote
+        String downvoteNumKey=RedisConstants.VIDEO_DOWNVOTENUM_CACHE_KEY_PREFIX+bv;
+        if(vote==-1)
+        {
+            stringRedisTemplate.opsForHash().put(voteKey, userId.toString(), "0");
+            stringRedisTemplate.opsForValue().decrement(downvoteNumKey);
+        }
+        else
+        {
+            stringRedisTemplate.opsForHash().put(voteKey, userId.toString(), "-1");
+            stringRedisTemplate.opsForValue().increment(downvoteNumKey);
+            if(vote==1)
+            {
+                stringRedisTemplate.opsForValue().decrement(RedisConstants.VIDEO_UPVOTENUM_CACHE_KEY_PREFIX+bv);
+            }
+        }
+
+        //return the refreshed downvote number
+        Long downvoteNum=Long.parseLong(stringRedisTemplate.opsForValue().get(downvoteNumKey));
+
+        return downvoteNum;
     }
 
     @Override
@@ -389,7 +425,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
         //when reach the mysql, discard those data that got in redis, use the data from mysql.
         //get the latest coin put from mysql
         VideoCoin videoCoin = videoCoinDao.getLatestByBvAndUserId(bv, userId);
-        if(  videoCoin==null||videoCoin.getPutDate().before( Date.valueOf(LocalDate.now()) )  ) //haven't put coin today
+        if(  videoCoin==null||videoCoin.getPutDate().isBefore( LocalDate.now()) ) //haven't put coin today
         {
             videoCoin=createVideoCoin(bv,userId);
         }
@@ -405,6 +441,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
         System.out.println(videoCoin);
         if(videoCoin.getId()==null) //haven't put coin today,so the videoCoin is a new VideoCoin which has no id yet, should save in mysql
         {
+            videoCoin.setId(snowflake.nextId());
             videoCoinDao.save(videoCoin);
         }
         else if(videoCoinDao.update(videoCoin)==0) // have put coin today, update it.
@@ -446,7 +483,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
         }
 
         //then, see if in redis
-        String key=RedisConstants.VIDEO_UPVOTE_CACHE_KEY_PREFIX + bv;
+        String key=RedisConstants.VIDEO_VOTE_CACHE_KEY_PREFIX + bv;
         Boolean isExist = stringRedisTemplate.hasKey(key);
 
         //if not in redis , reconstruct is
@@ -467,9 +504,45 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
             }
         }
 
-        Long upvoteNum = stringRedisTemplate.opsForSet().size(key);
+        Long upvoteNum = Long.parseLong(stringRedisTemplate.opsForValue().get(RedisConstants.VIDEO_UPVOTENUM_CACHE_KEY_PREFIX));
 
         return upvoteNum;
+    }
+
+    @Override
+    public Long getDownvoteNumByBv(String bv)
+    {
+        //see if in bloom filter
+        if(!bloomFilter.contains(bv))
+        {
+            return null;
+        }
+
+        //then, see if in redis
+        String key=RedisConstants.VIDEO_VOTE_CACHE_KEY_PREFIX + bv;
+        Boolean isExist = stringRedisTemplate.hasKey(key);
+
+        //if not in redis , reconstruct is
+        if(isExist==null||!isExist)
+        {
+            RLock lock = redissonClient.getLock(RedisConstants.VIDEO_VOTE_LOCK_KEY_PREFIX + bv);
+            boolean isLocked=lock.tryLock();
+            if(isLocked)
+            {
+                try
+                {
+                    loadVoteIntoRedis(bv);
+                }
+                finally
+                {
+                    lock.unlock();
+                }
+            }
+        }
+
+        Long downvoteNum = Long.parseLong(stringRedisTemplate.opsForValue().get(RedisConstants.VIDEO_DOWNVOTENUM_CACHE_KEY_PREFIX));
+
+        return downvoteNum;
     }
 
     @Override
@@ -528,9 +601,8 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
     private void loadVoteIntoRedis(String bv)
     {
         //get the keys of sets in redis that contains users who upvoted or downvoted or canceled to the video
-        String upvoteKey=RedisConstants.VIDEO_UPVOTE_CACHE_KEY_PREFIX + bv;
-        String novoteKey=RedisConstants.VIDEO_NOVOTE_CACHE_KEY_PREFIX + bv;
-        String downvoteKey=RedisConstants.VIDEO_DOWNVOTE_CACHE_KEY_PREFIX + bv;
+        String voteKey=RedisConstants.VIDEO_VOTE_CACHE_KEY_PREFIX + bv;
+
 
         //query all the vote information about the video from mysql
         List<VideoVote> videoVoteList = videoVoteDao.getByBv(bv);
@@ -544,7 +616,11 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
             String[] upvoteUserIds = groupedMap.get(1).stream()
                     .map(videoVote -> String.valueOf(videoVote.getUserId()))
                     .toArray(String[]::new);
-            stringRedisTemplate.opsForSet().add(upvoteKey,upvoteUserIds);
+
+            for(String upvoteUserId:upvoteUserIds)
+            {
+                stringRedisTemplate.opsForHash().put(voteKey,upvoteUserId,1);
+            }
         }
 
         if(groupedMap.get(0)!=null)
@@ -552,7 +628,11 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
             String[] novoteUserIds = groupedMap.get(0).stream()
                     .map(videoVote -> String.valueOf(videoVote.getUserId()))
                     .toArray(String[]::new);
-            stringRedisTemplate.opsForSet().add(novoteKey,novoteUserIds);
+
+            for(String novoteUserId:novoteUserIds)
+            {
+                stringRedisTemplate.opsForHash().put(voteKey,novoteUserId,0);
+            }
         }
 
         if(groupedMap.get(-1)!=null)
@@ -560,7 +640,11 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
             String[] downvoteUserIds = groupedMap.get(-1).stream()
                     .map(videoVote -> String.valueOf(videoVote.getUserId()))
                     .toArray(String[]::new);
-            stringRedisTemplate.opsForSet().add(downvoteKey,downvoteUserIds);
+
+            for(String downvoteUserId:downvoteUserIds)
+            {
+                stringRedisTemplate.opsForHash().put(voteKey,downvoteUserId,-1);
+            }
         }
     }
 
@@ -570,8 +654,7 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
         videoCoin.setCoinNum(0);
         videoCoin.setBv(bv);
         videoCoin.setUserId(userId);
-        videoCoin.setPutDate(Date.valueOf(LocalDate.now()));
-
+        videoCoin.setPutDate(LocalDate.now());
         return videoCoin;
     }
 
@@ -589,5 +672,11 @@ public class VideoServiceImpl extends ServiceImpl<VideoDao, Video> implements Vi
         }
 
         return videoVote;
+    }
+
+    public boolean publish()
+    {
+        //TODO
+        return false;
     }
 }

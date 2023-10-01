@@ -1,12 +1,17 @@
 package com.ausn.video.feignClient;
 
+import com.ausn.entity.VideoFeedStream;
 import com.ausn.feign.feignClient.IVideoClient;
 import com.ausn.video.dao.VideoDao;
+import com.ausn.video.service.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @Author: 付显贵
@@ -29,5 +34,11 @@ public class VideoClientImpl implements IVideoClient
     )
     {
         return videoDao.updateCommentNumByBv(bv,num);
+    }
+
+    @Override
+    public List<VideoFeedStream> getNewVideos(Long authorId, LocalDateTime time)
+    {
+        return videoDao.getNewVideos(authorId,time);
     }
 }

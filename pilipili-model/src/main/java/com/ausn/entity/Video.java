@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 /*
 create table videos
@@ -33,7 +34,7 @@ public class Video {
     private String title; //标题
     private Long authorId; //作者id
     private Long viewNum; //播放量
-    private Timestamp uploadDate; //上传日期
+    private LocalDateTime uploadTime; //上传时间
     private Long bulletScreenNum; //弹幕数量
     private Long commentNum; //评论数量
     private Long upvoteNum; //点赞数量

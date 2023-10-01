@@ -19,15 +19,16 @@ public interface VideoService extends IService<Video>
 {
     public void handleChunk(MultipartFile chunkFile, Long seqNum, String videoId);
     public void mergeChunks(String bv, Long chunkSize, Long totalSize, String videoId) throws IOException, InterruptedException;
-    public Result delete(Video video);
     public Video getByBv(String bv);
     public Result getByAuthorId(String authorId);
     public Result getRandomly();
     public Long upvote(String bv);
-    public Result downvote(String bv);
+    public Long downvote(String bv);
     public Result coin(String bv, int num);
     public Result favorite(String bv);
     public Long getUpvoteNumByBv(String bv);
+    public Long getDownvoteNumByBv(String bv);
     public Result getCoinNumByBv(String bv);
     public String createNewVideoAndSave(VideoUploadRequest videoUploadRequest);
+
 }

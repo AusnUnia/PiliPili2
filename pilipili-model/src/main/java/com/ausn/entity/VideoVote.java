@@ -1,5 +1,6 @@
 package com.ausn.entity;
 
+import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
@@ -21,6 +22,8 @@ create table video_votes
 @TableName("user_votes")
 public class VideoVote
 {
+    @TableId
+    private Long id;
     private String bv;
     private Long userId;
     private int vote; // 1 is upvote, 0 is no action, -1 is downvote

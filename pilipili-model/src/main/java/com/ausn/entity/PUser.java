@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.sql.Date;
+import java.time.LocalDate;
 
 /*
 create table pusers
@@ -26,7 +27,7 @@ public class PUser
     private String phoneNumber; //user's phone number
     private String nickName; //昵称
     private String gender; //性别
-    private Date birthday; //生日
+    private LocalDate birthday; //生日
     private String avatarPath; //头像存放位置
     private String password;
     private String salt;

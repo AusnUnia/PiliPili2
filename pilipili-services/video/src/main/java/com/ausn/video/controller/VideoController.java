@@ -123,7 +123,12 @@ public class VideoController
     @PutMapping("/downvote/BV{bv}")
     public Result downvote(@PathVariable String bv)
     {
-        return videoService.downvote(bv);
+        Long upvoteNum=videoService.getDownvoteNumByBv(bv);
+        if(upvoteNum==null)
+        {
+            return Result.fail(ResultCode.GET_ERR,"no such video!");
+        }
+        return Result.ok(ResultCode.GET_OK,upvoteNum);
     }
 
     @PutMapping("/coin/BV{bv}/{num}")
@@ -149,4 +154,5 @@ public class VideoController
     {
         return videoService.favorite(bv);
     }
+
 }

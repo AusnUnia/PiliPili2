@@ -34,6 +34,10 @@ spring:
     nacos:
       server-addr: 192.168.107.128:8848
 
+    sentinel:
+      transport:
+        dashboard: 192.168.107.128:8858
+
 
 login:
   types:

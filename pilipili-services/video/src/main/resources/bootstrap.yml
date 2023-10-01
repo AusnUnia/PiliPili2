@@ -21,6 +21,14 @@ spring:
     nacos:
       server-addr: 192.168.107.128:8848
 
+    sentinel:
+      transport:
+        dashboard: 192.168.107.128:8858
+
+feign:
+  sentinel:
+    enabled: true
+
 seata:
   registry:
     type: nacos
@@ -51,10 +59,12 @@ xxl:
 ### xxl-job executor registry-address: default use address to registry , otherwise use ip:port if address is null
       address:
 ### xxl-job executor server-info
-      ip:
+      ip: 127.0.0.1
 
-      port: 9999
+      port: 12271
 ### xxl-job executor log-path
       logpath: /data/applogs/xxl-job/jobhandler
 ### xxl-job executor log-retention-days
       logretentiondays: 30
+
+
